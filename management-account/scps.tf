@@ -89,18 +89,17 @@ resource "aws_organizations_policy" "deny_disable_security_services" {
   content = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Sid    = "DenyDisableGuardDuty"
-        Effect = "Deny"
-        Action = [
-          "guardduty:DeleteDetector",
-          "guardduty:DisassociateFromMasterAccount",
-          "guardduty:StopMonitoringMembers",
-          "guardduty:UpdateDetector"
-        ]
-        Resource = "*"
-      },
-      {
+         {
+  Sid    = "DenyDisableGuardDuty"
+  Effect = "Deny"
+  Action = [
+    "guardduty:DeleteDetector",
+    "guardduty:DisassociateFromMasterAccount",
+    "guardduty:StopMonitoringMembers"
+  ]
+  Resource = "*"
+},
+   {
         Sid    = "DenyDisableCloudTrail"
         Effect = "Deny"
         Action = [
