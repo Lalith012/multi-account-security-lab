@@ -84,19 +84,21 @@ CloudTrail · Security Hub · AWS Config · Python · GitHub
 
 |---|---|---|
 
-| 1 | Environment Setup + Terraform Foundation | In Progress |
+| 1 | Environment Setup + Terraform Foundation | Complete |
 
-| 2 | AWS Organizations Setup | Planned |
+| 2 | AWS Organizations Setup | Complete |
 
-| 3 | Service Control Policies | Planned |
+| 3 | Service Control Policies | Complete |
 
-| 4 | IAM Identity Center | Planned |
+| 4 | IAM Identity Center | Complete |
 
-| 5 | Security Baseline Automation | Planned |
+| 5 | Security Baseline Automation | Complete |
 
-| 6 | Cross-Account Security Monitoring | Planned |
+| 6 | Cross-Account Security Monitoring | Complete |
 
-| 7 | Final Documentation and Report | Planned |
+| 7 | Final Documentation and Report | Complete |
+
+
 
 
 
