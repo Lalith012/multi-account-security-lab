@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 3 — Multi-Account AWS Security Architecture</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --teal: #39d353;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.7; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem; }
+  .header h1 { font-size: 28px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+  .header .meta { color: var(--text2); font-size: 13px; font-family: monospace; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--blue); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+  h2 { font-size: 18px; font-weight: 600; color: var(--blue); margin: 2rem 0 1rem; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 14px; font-weight: 600; color: var(--text); margin: 1.2rem 0 0.5rem; }
+  p { color: var(--text2); margin-bottom: 0.75rem; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 13px; }
+  th { background: var(--bg3); color: var(--text2); text-align: left; padding: 8px 12px; border: 1px solid var(--border); font-weight: 500; }
+  td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .finding { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; border-left: 3px solid var(--yellow); }
+  .finding.high { border-left-color: var(--red); }
+  .finding.low { border-left-color: var(--green); }
+  .finding-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .finding-title { font-size: 13px; font-weight: 600; }
+  code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; color: var(--teal); }
+  .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .phase-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .phase-number { font-size: 11px; color: var(--text2); font-family: monospace; margin-bottom: 4px; }
+  .phase-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .phase-status { font-size: 11px; }
+  .arch-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; font-family: monospace; font-size: 12px; color: var(--text2); line-height: 1.8; margin-bottom: 1rem; }
+  .section { margin-bottom: 2.5rem; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Project 3 — Multi-Account AWS Security Architecture</h1>
+    <div class="meta">
+      Completed: 2026-05-27 &nbsp;|&nbsp;
+      Repo: github.com/Lalith012/multi-account-security-lab &nbsp;|&nbsp;
+      Commits: 6+
+    </div>
+    <div style="margin-top:12px">
+      <span class="badge badge-green">Complete</span>
+      <span class="badge badge-blue">Terraform</span>
+      <span class="badge badge-blue">AWS Organizations</span>
+      <span class="badge badge-purple">IaC</span>
+      <span class="badge badge-yellow">Multi-Account</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Executive Summary</h2>
+    <p>Designed and deployed an enterprise-grade multi-account AWS security architecture using Terraform Infrastructure as Code. The project demonstrates governance at scale — enforcing security controls across multiple AWS accounts from a central management account using AWS Organizations, Service Control Policies, IAM Identity Center, and delegated administrator patterns for GuardDuty and Security Hub.</p>
+    <p>All infrastructure is version-controlled, reproducible, and mirrors real enterprise cloud security patterns used in production environments across Fortune 500 companies.</p>
+  </div>
+
+  <div class="section">
+    <h2>Account Architecture</h2>
+    <div class="arch-box">
+Root (r-9gja) — Organization: o-335l45hy8d
+├── Management Account (986151953551) — Lalith2
+│   └── Role: Governance, SCPs, Delegated Admin
+│       GuardDuty Admin | Security Hub Admin | IAM Identity Center
+│
+├── Workloads OU (ou-9gja-lay9e0yi) ← SCPs enforced here
+│   └── Member Account (664858858896) — Lalith
+│       Role: Workloads, Security Tooling
+│       GuardDuty | CloudTrail | Security Hub
+│
+├── Security OU (ou-9gja-rg0kdjli) — Reserved
+└── Sandbox OU (ou-9gja-rtqhlkrc) — Reserved
+    </div>
+
+    <table>
+      <tr><th>Account</th><th>ID</th><th>Role</th><th>OU</th></tr>
+      <tr><td>Lalith2 (Management)</td><td><code>986151953551</code></td><td>Governance only</td><td>Root</td></tr>
+      <tr><td>Lalith (Member)</td><td><code>664858858896</code></td><td>Workloads + Security</td><td>Workloads OU</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Project Phases</h2>
+    <div class="phase-grid">
+      <div class="phase-card">
+        <div class="phase-number">PHASE 1</div>
+        <div class="phase-name">Environment Setup & Terraform Foundation</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">Terraform v1.15.4, repo scaffold, S3 remote state backend (terraform-state-986151953551), DynamoDB lock table, AWS provider v5.100.0</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number">PHASE 2</div>
+        <div class="phase-name">AWS Organizations Setup</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">Organization o-335l45hy8d, 3 OUs via Terraform, member account invited and placed in Workloads OU</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number">PHASE 3</div>
+        <div class="phase-name">Service Control Policies</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">3 SCPs: Region lock (ap-south-1), Root denial, Security service protection — all attached to Workloads OU</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number">PHASE 4</div>
+        <div class="phase-name">IAM Identity Center</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">SecurityAdminAccess (8hr) and ReadOnlyAccess (4hr) permission sets, Identity Store d-9f67527363</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number">PHASE 5</div>
+        <div class="phase-name">Security Baseline Automation</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">GuardDuty, CloudTrail (multi-region, encrypted S3), Security Hub (CIS v1.4.0 + AWS FSBP) — all Terraform managed</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number">PHASE 6</div>
+        <div class="phase-name">Cross-Account Security Monitoring</div>
+        <div class="phase-status"><span class="badge badge-green">Complete</span></div>
+        <p style="margin-top:8px;font-size:12px">GuardDuty and Security Hub delegated admin in management account, org-wide auto-enrollment, findings aggregated centrally</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Service Control Policies</h2>
+    <table>
+      <tr><th>SCP Name</th><th>ID</th><th>Target</th><th>Purpose</th></tr>
+      <tr><td>DenyNonMumbaiRegions</td><td><code>p-m620jcgl</code></td><td>Workloads OU</td><td>Restricts all actions to ap-south-1 — global services exempted</td></tr>
+      <tr><td>DenyRootAccountUsage</td><td><code>p-g4mnytx3</code></td><td>Workloads OU</td><td>Blocks all actions by root user in member accounts</td></tr>
+      <tr><td>DenyDisableSecurityServices</td><td><code>p-u97j4xop</code></td><td>Workloads OU</td><td>Prevents deletion or disabling of GuardDuty, CloudTrail, Security Hub</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Security Baseline</h2>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">GuardDuty</div>
+        <p style="font-size:12px">Detector: <code>f8cf1ff1835c1137f850dda85d39f774</code></p>
+        <p style="font-size:12px">S3 protection: Enabled</p>
+        <p style="font-size:12px">Malware protection (EBS): Enabled</p>
+        <p style="font-size:12px">Org admin: <code>986151953551</code></p>
+        <p style="font-size:12px">Auto-enrollment: ALL members</p>
+      </div>
+      <div class="card">
+        <div class="card-title">CloudTrail</div>
+        <p style="font-size:12px">Trail: <code>security-lab-trail</code></p>
+        <p style="font-size:12px">Multi-region: Enabled</p>
+        <p style="font-size:12px">Log validation: Enabled</p>
+        <p style="font-size:12px">S3 data events: Enabled</p>
+        <p style="font-size:12px">Bucket: <code>cloudtrail-logs-664858858896</code></p>
+      </div>
+      <div class="card">
+        <div class="card-title">Security Hub</div>
+        <p style="font-size:12px">CIS AWS Foundations Benchmark v1.4.0: Enabled</p>
+        <p style="font-size:12px">AWS Foundational Security Best Practices v1.0.0: Enabled</p>
+        <p style="font-size:12px">Org admin: <code>986151953551</code></p>
+        <p style="font-size:12px">Auto-enable new members: Enabled</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Remote State</div>
+        <p style="font-size:12px">Bucket: <code>terraform-state-986151953551</code></p>
+        <p style="font-size:12px">Lock table: <code>terraform-state-lock</code></p>
+        <p style="font-size:12px">Encryption: SSE-S3</p>
+        <p style="font-size:12px">Versioning: Enabled</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Engineering Findings & Lessons</h2>
+
+    <div class="finding high">
+      <div class="finding-header">
+        <div class="finding-title">Finding 1 — SCP Lockout: Root Account Blocked from Member Account</div>
+        <span class="badge badge-red">High</span>
+      </div>
+      <p style="font-size:12px"><strong>Phase:</strong> 5 — Security Baseline Automation</p>
+      <p style="font-size:12px"><strong>What happened:</strong> DenyRootAccountUsage SCP blocked root from performing IAM operations in the member account before the IAM user had AdministratorAccess. Created a catch-22 — IAM user couldn't fix itself, root was blocked by SCP.</p>
+      <p style="font-size:12px"><strong>Resolution:</strong> Temporarily detached SCP from management account console, granted AdministratorAccess to IAM user via root, reattached SCP via terraform apply.</p>
+      <p style="font-size:12px"><strong>Lesson:</strong> Always ensure IAM users have sufficient permissions before deploying root denial SCPs. Document a break-glass procedure. Management account is always SCP-exempt.</p>
+    </div>
+
+    <div class="finding">
+      <div class="finding-header">
+        <div class="finding-title">Finding 2 — Over-Broad SCP Blocking Terraform Operations</div>
+        <span class="badge badge-yellow">Medium</span>
+      </div>
+      <p style="font-size:12px"><strong>Phase:</strong> 5 — Security Baseline Automation</p>
+      <p style="font-size:12px"><strong>What happened:</strong> guardduty:UpdateDetector in deny list blocked Terraform from updating detector configuration (tags, datasource settings).</p>
+      <p style="font-size:12px"><strong>Resolution:</strong> Removed guardduty:UpdateDetector from deny list. Kept only destructive actions: DeleteDetector, DisassociateFromMasterAccount, StopMonitoringMembers.</p>
+      <p style="font-size:12px"><strong>Lesson:</strong> SCPs should deny the minimum set of actions. Test SCPs in Sandbox OU before applying to Workloads.</p>
+    </div>
+
+    <div class="finding low">
+      <div class="finding-header">
+        <div class="finding-title">Finding 3 — Existing Resources Require Terraform Import</div>
+        <span class="badge badge-green">Low</span>
+      </div>
+      <p style="font-size:12px"><strong>Phase:</strong> 5 — Security Baseline Automation</p>
+      <p style="font-size:12px"><strong>What happened:</strong> GuardDuty and Security Hub already existed in member account from Project 1. Terraform attempted to create duplicates.</p>
+      <p style="font-size:12px"><strong>Resolution:</strong> Used terraform import to bring existing resources under Terraform state management.</p>
+      <p style="font-size:12px"><strong>Lesson:</strong> In brownfield environments, always audit existing resources before writing Terraform. Use terraform import, never destroy-and-recreate security services.</p>
+    </div>
+
+    <div class="finding low">
+      <div class="finding-header">
+        <div class="finding-title">Finding 4 — Unicode Character Rejected by AWS SSO API</div>
+        <span class="badge badge-green">Low</span>
+      </div>
+      <p style="font-size:12px"><strong>Phase:</strong> 4 — IAM Identity Center</p>
+      <p style="font-size:12px"><strong>What happened:</strong> Em dash (—) in permission set description caused ValidationException from AWS SSO API.</p>
+      <p style="font-size:12px"><strong>Resolution:</strong> Replaced em dash with standard hyphen (-).</p>
+      <p style="font-size:12px"><strong>Lesson:</strong> AWS SSO API only accepts ASCII characters in string fields.</p>
+    </div>
+
+    <div class="finding">
+      <div class="finding-header">
+        <div class="finding-title">Finding 5 — Security Hub enable_default_standards Conflict</div>
+        <span class="badge badge-yellow">Medium</span>
+      </div>
+      <p style="font-size:12px"><strong>Phase:</strong> 5 — Security Baseline Automation</p>
+      <p style="font-size:12px"><strong>What happened:</strong> After importing Security Hub, plan showed destroy-and-recreate due to enable_default_standards mismatch. SCP blocked the disable operation.</p>
+      <p style="font-size:12px"><strong>Resolution:</strong> Set enable_default_standards = false in config to match existing state. Managed standards separately via aws_securityhub_standards_subscription.</p>
+      <p style="font-size:12px"><strong>Lesson:</strong> After terraform import, always reconcile config with actual state before applying.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Tech Stack</h2>
+    <table>
+      <tr><th>Tool / Service</th><th>Version / Detail</th><th>Purpose</th></tr>
+      <tr><td>Terraform</td><td>v1.15.4</td><td>Infrastructure as Code</td></tr>
+      <tr><td>AWS Provider</td><td>v5.100.0</td><td>Terraform AWS integration</td></tr>
+      <tr><td>AWS Organizations</td><td>—</td><td>Multi-account governance</td></tr>
+      <tr><td>Service Control Policies</td><td>3 policies</td><td>Permission guardrails</td></tr>
+      <tr><td>IAM Identity Center</td><td>2 permission sets</td><td>Centralized SSO</td></tr>
+      <tr><td>GuardDuty</td><td>Org-level</td><td>Threat detection</td></tr>
+      <tr><td>CloudTrail</td><td>Multi-region</td><td>API audit logging</td></tr>
+      <tr><td>Security Hub</td><td>CIS v1.4.0 + FSBP</td><td>Centralized findings</td></tr>
+      <tr><td>S3 + DynamoDB</td><td>—</td><td>Terraform remote state</td></tr>
+      <tr><td>Python / AWS CLI</td><td>—</td><td>Account setup, verification</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Interview Talking Points</h2>
+    <div class="card">
+      <p style="font-size:12px">1. <strong>Why management account is governance-only:</strong> SCPs don't apply to the management account itself. Placing workloads there defeats the purpose of the control hierarchy.</p>
+      <p style="font-size:12px">2. <strong>Why SCPs over IAM policies for guardrails:</strong> IAM policies can be modified by account admins. SCPs enforced from above cannot be overridden by anyone in the member account — even the root user.</p>
+      <p style="font-size:12px">3. <strong>Why delegated admin pattern:</strong> Allows security tooling to be centrally managed without granting management account credentials to security teams. Principle of least privilege at the organizational level.</p>
+      <p style="font-size:12px">4. <strong>Why remote state with locking:</strong> Prevents concurrent Terraform runs from corrupting state. S3 versioning allows rollback. DynamoDB provides atomic locking.</p>
+      <p style="font-size:12px">5. <strong>What the SCP lockout taught you:</strong> Always define a break-glass procedure before enforcing root denial. The management account's SCP exemption is the recovery path — document it before you need it.</p>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:2rem;color:var(--text2);font-size:12px;font-family:monospace;">
+    Generated: 2026-05-27 &nbsp;|&nbsp; Project 3 of 4 &nbsp;|&nbsp; Cloud Security Engineering Portfolio
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,28 +1,12 @@
 # -------------------------------------------------------
 # GuardDuty Configuration — Member Account
 # Account: 664858858896
+# Note: Datasource settings managed by delegated admin
+# (management account 986151953551)
 # -------------------------------------------------------
 
 resource "aws_guardduty_detector" "member" {
   enable = true
-
-  datasources {
-    s3_logs {
-      enable = true
-    }
-    kubernetes {
-      audit_logs {
-        enable = false
-      }
-    }
-    malware_protection {
-      scan_ec2_instance_with_findings {
-        ebs_volumes {
-          enable = true
-        }
-      }
-    }
-  }
 
   tags = {
     Name        = "guardduty-member-account"
