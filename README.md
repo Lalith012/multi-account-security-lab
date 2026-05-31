@@ -80,9 +80,11 @@ This project implements a production-grade multi-account AWS security architectu
 
 Three SCPs enforced on the Workloads OU — applied to every account in the OU automatically:
 
-✅ DenyNonMumbaiRegions        → Restricts all actions to ap-south-1
-✅ DenyRootAccountUsage        → Blocks all root user actions in member accounts
-✅ DenyDisableSecurityServices → Prevents deletion of GuardDuty, CloudTrail, Security Hub
+| SCP | Policy ID | Purpose |
+|---|---|---|
+| ✅ DenyNonMumbaiRegions | p-m620jcgl | Restricts all actions to ap-south-1 |
+| ✅ DenyRootAccountUsage | p-g4mnytx3 | Blocks all root user actions in member accounts |
+| ✅ DenyDisableSecurityServices | p-u97j4xop | Prevents deletion of GuardDuty, CloudTrail, Security Hub |
 
 > SCPs cannot be overridden by anyone in the member account — not even the account's own root user.
 
